@@ -161,7 +161,9 @@ plugins:
   - source: "@quartz-community/bases-page"
     enabled: false
   - source: "@quartz-community/note-properties"
-    enabled: false
+    enabled: true
+    options:
+      hidePropertiesView: true
   - source: "@quartz-community/unlisted-pages"
     enabled: true
   - source: "@quartz-community/encrypted-pages"

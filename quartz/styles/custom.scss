@@ -1,6 +1,8 @@
 @use "./variables.scss" as *;
 
 // === 左下角固定工具栏: ☰ (目录折叠) + 主题切换 ===
+// 初始隐藏, 等 sidebarToggle.inline.ts 跑完 (应用了 saved-theme) 再可见
+// 避免 light 主题下 dayIcon 先渲染, 后切到 dark 时 dayIcon 闪一下消失
 .toolbar-fixed {
   position: fixed;
   bottom: 1.2rem;
@@ -8,6 +10,11 @@
   display: flex;
   gap: 0.6rem;
   z-index: 100;
+  visibility: hidden;
+}
+
+.toolbar-fixed.ready {
+  visibility: visible;
 }
 
 // 两个按钮统一: 圆形, 同样大小
@@ -54,6 +61,15 @@
   stroke: currentColor;
 }
 
+// === darkmode 图标显隐 (原 darkmode 组件的 CSS, 禁用组件后需手动补上) ===
+:root[saved-theme="dark"] { color-scheme: dark; }
+:root[saved-theme="light"] { color-scheme: light; }
+
+:root[saved-theme="dark"] .darkmode > .dayIcon { display: none; }
+:root[saved-theme="dark"] .darkmode > .nightIcon { display: inline; }
+:root .darkmode > .dayIcon { display: inline; }
+:root .darkmode > .nightIcon { display: none; }
+
 // ☰ 折叠状态变色
 .sidebar-toggle[aria-expanded="false"] {
   color: var(--secondary);
@@ -81,21 +97,37 @@ body.theme-dark .toolbar-fixed button {
 }
 
 // === 桌面端 sidebar 折叠 ===
+// 关键: 折叠时 grid 改成单列布局, footer 跨整行居中显示
+// (否则 footer 仍占 grid-sidebar-left 列=0宽, 加上 base.scss 的 min-width:100%
+//  会导致 footer 内容横向溢出覆盖到 .center 文章底部, 形成重叠)
 @media all and ($desktop) {
-  body.sidebar-collapsed #quartz-root .left.sidebar {
+  body.sidebar-collapsed #quartz-root .left.sidebar,
+  body.sidebar-collapsed #quartz-root .right.sidebar {
     display: none;
   }
 
   body.sidebar-collapsed #quartz-body {
-    grid-template-columns: 0 1fr 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "grid-header"
+      "grid-center"
+      "grid-footer";
   }
 
-  // 显式给 .center grid-area, 否则被 auto-flow 放到 0 宽 sidebar 列
+  // 显式给 .center grid-area, 防止它被 auto-flow 放到 sidebar 列
   body.sidebar-collapsed #quartz-body > .center {
-    grid-area: 2 / 2 / 4 / 3;
+    grid-area: grid-center;
     min-width: 0;
     max-width: 100%;
     width: 100%;
+  }
+
+  // footer 跨整行, 不再被 min-width:100% 限制撑破 sidebar 列
+  body.sidebar-collapsed #quartz-body > footer {
+    grid-area: grid-footer;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 

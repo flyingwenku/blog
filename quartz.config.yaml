@@ -99,12 +99,11 @@ plugins:
     layout:
       position: left
       priority: 1
+  # darkmode 组件禁用, 主题切换逻辑写在 sidebarToggle.inline.ts 里
+  # (Quartz 自带 darkmode 组件会在 sidebar 顶部渲染一个独立的小太阳按钮,
+  #  跟我们的工具栏按钮重复, 所以干脆禁掉, 自己实现一套)
   - source: "@quartz-community/darkmode"
-    enabled: true
-    layout:
-      position: left
-      priority: 30
-      group: toolbar
+    enabled: false
   - source: "@quartz-community/footer"
     enabled: true
     options:

@@ -6,6 +6,8 @@ import { QuartzEmitterPlugin } from "../types"
 import spaRouterScript from "../../components/scripts/spa.inline"
 // @ts-ignore
 import popoverScript from "../../components/scripts/popover.inline"
+// @ts-ignore
+import sidebarToggleScript from "../../components/scripts/sidebarToggle.inline"
 import baseStyles from "../../styles/base.scss"
 import customStyles from "../../styles/custom.scss"
 import popoverStyle from "../../components/styles/popover.scss"
@@ -268,6 +270,9 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       document.dispatchEvent(event)
     `)
   }
+
+  // docsify 风格: 左下角侧边栏折叠按钮 (移动端默认折叠 TOC)
+  componentResources.afterDOMLoaded.push(sidebarToggleScript)
 }
 
 // This emitter should not update the `resources` parameter. If it does, partial

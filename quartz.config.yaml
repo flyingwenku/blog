@@ -5,7 +5,7 @@ configuration:
   enableSPA: true
   enablePopovers: true
   locale: zh-CN
-  baseUrl: easy4ai.bbroot.com
+  baseUrl: flyingwenku.github.io/blog/
   ignorePatterns:
     - private
     - templates
@@ -119,7 +119,7 @@ plugins:
   - source: "@quartz-community/og-image"
     enabled: true
   - source: "@quartz-community/cname"
-    enabled: true
+    enabled: false
   - source: "@quartz-community/canvas-page"
     enabled: true
   - source: "@quartz-community/content-page"

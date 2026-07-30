@@ -1,93 +1,106 @@
 @use "./variables.scss" as *;
 
-// === docsify 风格: PC + 移动端都有的 ☰ 折叠按钮 ===
-// PC 端: 按钮绝对定位在 sidebar 顶部; 点击后整个 sidebar 收起 (body.sidebar-collapsed),
-//        按钮移到页面左上角
-// 移动端: 按钮在左下角; 点击后从左侧滑出 fixed sidebar (body.sidebar-open)
+// === 左下角固定工具栏: ☰ (目录折叠) + 主题切换 ===
+.toolbar-fixed {
+  position: fixed;
+  bottom: 1.2rem;
+  left: 1.2rem;
+  display: flex;
+  gap: 0.6rem;
+  z-index: 100;
+}
 
-// 按钮基础样式
-.sidebar-toggle {
-  display: inline-flex;
-  position: absolute;
-  top: 1.2rem;
-  right: 1rem;
-  z-index: 5;
-  width: 2.2rem;
-  height: 2.2rem;
+// 两个按钮统一: 圆形, 同样大小
+.toolbar-fixed button {
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
   border: 1px solid var(--lightgray);
   background: var(--light);
   color: var(--darkgray);
   cursor: pointer;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  transition: background 0.15s ease, color 0.15s ease;
   padding: 0;
+  margin: 0;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
 
   &:hover {
     background: var(--lightgray);
     color: var(--dark);
   }
+}
 
-  &[aria-expanded="false"] {
-    color: var(--secondary);
+// 覆盖 darkmode 组件默认样式 (它设了 width:20px height:32px background:none border:none)
+.toolbar-fixed button.darkmode {
+  width: 2.4rem;
+  height: 2.4rem;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+}
+
+.toolbar-fixed button.darkmode svg {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  fill: none;
+  stroke: currentColor;
+}
+
+// ☰ 折叠状态变色
+.sidebar-toggle[aria-expanded="false"] {
+  color: var(--secondary);
+}
+
+body.sidebar-open .sidebar-toggle {
+  background: var(--secondary);
+  color: var(--light);
+}
+
+// === 暗色模式按钮适配 ===
+// ⚠️ Quartz 暗色模式下 CSS 变量是反转的:
+//    --light = 深色背景 (#161618), --dark = 浅色背景 (#ebebec)
+//    所以背景用 var(--light), 文字用 var(--dark)
+:root[saved-theme="dark"] .toolbar-fixed button,
+body.theme-dark .toolbar-fixed button {
+  background: var(--light);
+  color: var(--dark);
+  border-color: var(--gray);
+
+  &:hover {
+    background: var(--lightgray);
+    color: var(--dark);
   }
 }
 
-// sidebar 是 absolute 按钮的定位参照
-#quartz-root .left.sidebar {
-  position: sticky;
-}
-
-// === 桌面端 collapsed 状态: 整个 sidebar 折叠, 按钮移到页面左上角 ===
+// === 桌面端 sidebar 折叠 ===
 @media all and ($desktop) {
   body.sidebar-collapsed #quartz-root .left.sidebar {
     display: none;
   }
 
-  // grid 列塌缩: sidebar-left 区域收成 0
-  // 注意: grid-template-columns 实际作用在 #quartz-body 上 (不是 #quartz-root)
   body.sidebar-collapsed #quartz-body {
     grid-template-columns: 0 1fr 0;
   }
 
-  // ⚠️ 关键: 显式给 .center 元素 grid-area, 让它占据中间列
-  // 否则没有显式 grid-area 的 .center 会被 grid-auto-flow 放到
-  // sidebar 列(0 宽), 导致 article 宽度变 0
+  // 显式给 .center grid-area, 否则被 auto-flow 放到 0 宽 sidebar 列
   body.sidebar-collapsed #quartz-body > .center {
-    grid-area: 2 / 2 / 4 / 3; // row 2-3, col 2
+    grid-area: 2 / 2 / 4 / 3;
     min-width: 0;
     max-width: 100%;
     width: 100%;
   }
-
-  // 按钮 fixed 到左上角
-  body.sidebar-collapsed .sidebar-toggle {
-    position: fixed;
-    top: 1.2rem;
-    left: 1.2rem;
-    right: auto;
-  }
-
-  // collapsed 时去掉 body padding-left, 让内容更贴近左边
-  body.sidebar-collapsed #quartz-body {
-    padding-left: 0.5rem;
-  }
 }
 
-// === 移动端: 按钮在左下角, sidebar 默认隐藏, 点击滑出 ===
+// === 移动端 sidebar 滑出 ===
 @media all and ($mobile) {
-  // 移动端按钮: 改为左下角 fixed
-  .sidebar-toggle {
-    position: fixed;
-    top: auto;
-    bottom: 1.2rem;
-    left: 1.2rem;
-    right: auto;
-  }
-
-  // 移动端默认隐藏左侧 sidebar
   #quartz-root .left.sidebar {
     display: none;
     position: fixed;
@@ -106,33 +119,13 @@
     box-shadow: 2px 0 12px rgba(0, 0, 0, 0.16);
   }
 
-  // 点击按钮后展开 sidebar
   body.sidebar-open #quartz-root .left.sidebar {
     display: flex;
   }
 
-  // 展开时按钮变深色提示
-  body.sidebar-open .sidebar-toggle {
-    background: var(--secondary);
-    color: var(--light);
-  }
-
-  // sidebar 内 TOC 在移动端占满宽度 (不再是横排)
   #quartz-root .left.sidebar > * {
     width: 100%;
     max-height: none;
-  }
-
-  // 暗色模式下按钮颜色适配
-  body.dark .sidebar-toggle {
-    background: var(--dark);
-    color: var(--darkgray);
-    border-color: var(--gray);
-
-    &:hover {
-      background: var(--gray);
-      color: var(--light);
-    }
   }
 
   body.dark #quartz-root .left.sidebar {
@@ -141,15 +134,11 @@
   }
 }
 
-// === TOC 样式调整: docsify 风格 ===
-
-// 隐藏 toc-header (里面的"目录"两字 + 折叠图标), 让 TOC 始终展开
+// === TOC 样式 ===
 button.toc-header {
   display: none !important;
 }
 
-// 解除 ul.toc-content.overflow 的 max-height 限制, 让 TOC 自然撑开
-// 兜底: 如果 TOC 项太多超过 sidebar 高度, ul 内部出现滚动条
 ul.toc-content.overflow {
   max-height: none !important;
   margin-top: 0 !important;
@@ -162,7 +151,6 @@ ul.toc-content.overflow {
   flex: 1 1 auto !important;
 }
 
-// 标题层级粗细: H1 粗体, H2+ 细体
 ul.toc-content.overflow > li.depth-0 > a {
   font-weight: $boldWeight;
   color: var(--dark);
@@ -185,24 +173,23 @@ ul.toc-content.overflow > li.depth-6 > a {
   opacity: 0.7 !important;
 }
 
-// === 左侧 sidebar 和主区的竖线分割 (docsify 风格) ===
-// 桌面端 sidebar 在左侧, 给它加右边框
+// === sidebar 竖线分割 (桌面端) ===
 @media all and ($desktop) {
   #quartz-root .left.sidebar {
     border-right: 1px solid var(--lightgray);
     padding-right: 1rem;
+    position: sticky;
   }
 }
 
-// 暗色模式下的分割线
 body.dark #quartz-root .left.sidebar {
   border-right-color: var(--gray);
 }
 
-// === sidebar 内部布局: 紧凑 ===
+// === sidebar 内部布局 ===
 #quartz-root .sidebar.left {
   gap: 0.8rem;
   padding-left: 1.2rem;
   padding-right: 1rem;
-  padding-top: 5rem; // 给绝对定位的 ☰ 按钮留位置
+  padding-top: 2rem;
 }

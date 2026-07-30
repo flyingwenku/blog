@@ -190,17 +190,14 @@ layout:
       left:
         - page-title
         - table-of-contents
-        - darkmode
       right: []
     folder:
       positions:
         left:
           - page-title
-          - darkmode
         right: []
     tag:
       positions:
         left:
           - page-title
-          - darkmode
         right: []

@@ -1,46 +1,52 @@
-// docsify 风格的侧边栏折叠按钮
-// PC 端: 点击后整个 sidebar 收起 (body.sidebar-collapsed), 按钮移到页面左上角
-// 移动端: 点击后从左侧滑出 fixed sidebar (body.sidebar-open)
-function setupSidebarToggle() {
-  // 避免重复创建
-  if (document.querySelector(".sidebar-toggle")) return
+// 左下角固定工具栏: ☰ (目录折叠) + 主题切换
+// darkmode 按钮带 class="darkmode", Quartz darkmode inline 脚本会自动绑定点击事件
+function setupToolbar() {
+  if (document.querySelector(".toolbar-fixed")) return
 
-  const btn = document.createElement("button")
-  btn.className = "sidebar-toggle"
-  btn.type = "button"
-  btn.setAttribute("aria-label", "切换目录")
-  btn.setAttribute("aria-expanded", "true")
-  // 菜单图标: 三条横线
-  btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`
+  const container = document.createElement("div")
+  container.className = "toolbar-fixed"
 
-  // 初始化: 同步 aria 状态
-  syncAria(btn)
+  // ☰ 目录折叠按钮
+  const toggleBtn = document.createElement("button")
+  toggleBtn.type = "button"
+  toggleBtn.className = "sidebar-toggle"
+  toggleBtn.setAttribute("aria-label", "切换目录")
+  toggleBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`
 
-  btn.addEventListener("click", () => {
-    // 移动端 (CSS 控制在移动端才生效) -> 切换 sidebar-open
-    // 桌面端 -> 切换 sidebar-collapsed
-    // 两个 class 互不冲突, 可同时存在
+  toggleBtn.addEventListener("click", () => {
     document.body.classList.toggle("sidebar-open")
     document.body.classList.toggle("sidebar-collapsed")
-    syncAria(btn)
+    syncToggleAria(toggleBtn)
   })
 
-  document.body.appendChild(btn)
+  // 主题切换按钮 (class="darkmode" 让 Quartz darkmode inline 脚本自动绑定)
+  const darkBtn = document.createElement("button")
+  darkBtn.type = "button"
+  darkBtn.className = "darkmode"
+  darkBtn.setAttribute("aria-label", "切换主题")
+  // 太阳图标 (dayIcon) + 月亮图标 (nightIcon)
+  // darkmode 组件 CSS 根据 :root[saved-theme] 控制显隐
+  darkBtn.innerHTML = `<svg class="dayIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><svg class="nightIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+
+  container.appendChild(toggleBtn)
+  container.appendChild(darkBtn)
+  document.body.appendChild(container)
+
+  syncToggleAria(toggleBtn)
 }
 
-function syncAria(btn: HTMLButtonElement) {
-  // collapsed 状态优先: 一旦折叠, 视为关闭
+function syncToggleAria(btn: HTMLButtonElement) {
   const isOpen = !document.body.classList.contains("sidebar-collapsed")
   btn.setAttribute("aria-expanded", isOpen ? "true" : "false")
 }
 
-// 立即执行一次 (不依赖 nav 事件, 因为 SPA router 可能在监听器注册前已派发 nav)
+// 立即执行 (afterDOMLoaded 时 DOM 已就绪, readyState 不是 loading)
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", setupSidebarToggle)
+  document.addEventListener("DOMContentLoaded", setupToolbar)
 } else {
-  setupSidebarToggle()
+  setupToolbar()
 }
 
-// SPA 切换页面时也重新确保按钮存在
-document.addEventListener("nav", setupSidebarToggle)
-document.addEventListener("render", setupSidebarToggle)
+// SPA 切换页面时重新确保工具栏存在
+document.addEventListener("nav", setupToolbar)
+document.addEventListener("render", setupToolbar)

@@ -10,8 +10,8 @@ draft: false
 
 ## 文章
 
-- [用 Quartz 搭建 Obsidian 博客](posts/hello-quartz.md)
-- [Obsidian 语法效果演示](posts/obsidian-syntax-demo.md)
+- [用 Quartz 搭建 Obsidian 博客](hello-quartz.md)
+- [Obsidian 语法效果演示](obsidian-syntax-demo.md)
 
 ## 关于
 

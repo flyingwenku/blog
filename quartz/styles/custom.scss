@@ -73,10 +73,8 @@
     width: 100%;
     max-height: none;
   }
-}
 
-// 暗色模式下按钮颜色适配
-@media all and ($mobile) {
+  // 暗色模式下按钮颜色适配
   body.dark .sidebar-toggle {
     background: var(--dark);
     color: var(--darkgray);
@@ -92,4 +90,54 @@
     background: var(--dark);
     border-right-color: var(--gray);
   }
+}
+
+// === TOC 样式调整: docsify 风格 ===
+
+// 隐藏 toc-header (里面的"目录"两字 + 折叠图标), 让 TOC 始终展开
+button.toc-header {
+  display: none !important;
+}
+
+// 标题层级粗细: H1 粗体, H2+ 细体
+ul.toc-content.overflow > li.depth-0 > a {
+  font-weight: $boldWeight;
+  color: var(--dark);
+  opacity: 1 !important;
+}
+
+ul.toc-content.overflow > li.depth-1 > a {
+  font-weight: $normalWeight;
+  color: var(--darkgray);
+  opacity: 0.85 !important;
+}
+
+ul.toc-content.overflow > li.depth-2 > a,
+ul.toc-content.overflow > li.depth-3 > a,
+ul.toc-content.overflow > li.depth-4 > a,
+ul.toc-content.overflow > li.depth-5 > a,
+ul.toc-content.overflow > li.depth-6 > a {
+  font-weight: $normalWeight;
+  color: var(--darkgray);
+  opacity: 0.7 !important;
+}
+
+// TOC 内容区调整: 去掉上边距 (因为没有 toc-header 了)
+ul.toc-content.overflow {
+  margin-top: 0 !important;
+}
+
+// === 左侧 sidebar 和主区的竖线分割 (docsify 风格) ===
+
+// 桌面端 sidebar 在左侧, 给它加右边框
+@media all and ($desktop) {
+  #quartz-root .left.sidebar {
+    border-right: 1px solid var(--lightgray);
+    padding-right: 1.5rem;
+  }
+}
+
+// 暗色模式下的分割线
+body.dark #quartz-root .left.sidebar {
+  border-right-color: var(--gray);
 }

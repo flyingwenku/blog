@@ -260,6 +260,12 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
     `)
   }
 
+  // docsify 风格: 左下角侧边栏折叠按钮 (移动端默认折叠 TOC)
+  // 必须 push 在 SPA router 之前——componentResources.ts 默认假设
+  // afterDOMLoaded 数组的最后一项是 SPA router, postscript 会单独 await import
+  // 它来确保 nav 事件在所有组件脚本注册监听器之后才派发
+  componentResources.afterDOMLoaded.push(sidebarToggleScript)
+
   if (cfg.enableSPA) {
     componentResources.afterDOMLoaded.push(spaRouterScript)
   } else {
@@ -270,9 +276,6 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       document.dispatchEvent(event)
     `)
   }
-
-  // docsify 风格: 左下角侧边栏折叠按钮 (移动端默认折叠 TOC)
-  componentResources.afterDOMLoaded.push(sidebarToggleScript)
 }
 
 // This emitter should not update the `resources` parameter. If it does, partial

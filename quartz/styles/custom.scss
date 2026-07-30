@@ -1,16 +1,19 @@
 @use "./variables.scss" as *;
 
-// === docsify 风格: 左下角折叠按钮 + 移动端默认折叠左侧 TOC ===
+// === docsify 风格: PC + 移动端都有的 ☰ 折叠按钮 ===
+// PC 端: 按钮绝对定位在 sidebar 顶部; 点击后整个 sidebar 收起 (body.sidebar-collapsed),
+//        按钮移到页面左上角
+// 移动端: 按钮在左下角; 点击后从左侧滑出 fixed sidebar (body.sidebar-open)
 
-// 折叠按钮: 固定在左下角, 桌面端隐藏, 移动端显示
+// 按钮基础样式
 .sidebar-toggle {
-  display: none; // 桌面端默认隐藏
-  position: fixed;
-  bottom: 1.2rem;
-  left: 1.2rem;
-  z-index: 100;
-  width: 2.6rem;
-  height: 2.6rem;
+  display: inline-flex;
+  position: absolute;
+  top: 1.2rem;
+  right: 1rem;
+  z-index: 5;
+  width: 2.2rem;
+  height: 2.2rem;
   border-radius: 50%;
   border: 1px solid var(--lightgray);
   background: var(--light);
@@ -27,18 +30,64 @@
     color: var(--dark);
   }
 
-  &[aria-expanded="true"] {
+  &[aria-expanded="false"] {
     color: var(--secondary);
   }
 }
 
-@media all and ($mobile) {
-  // 移动端显示折叠按钮
-  .sidebar-toggle {
-    display: inline-flex;
+// sidebar 是 absolute 按钮的定位参照
+#quartz-root .left.sidebar {
+  position: sticky;
+}
+
+// === 桌面端 collapsed 状态: 整个 sidebar 折叠, 按钮移到页面左上角 ===
+@media all and ($desktop) {
+  body.sidebar-collapsed #quartz-root .left.sidebar {
+    display: none;
   }
 
-  // 移动端默认隐藏左侧 sidebar 内容 (Quartz 默认会让它横排在顶部)
+  // grid 列塌缩: sidebar-left 区域收成 0
+  // 注意: grid-template-columns 实际作用在 #quartz-body 上 (不是 #quartz-root)
+  body.sidebar-collapsed #quartz-body {
+    grid-template-columns: 0 1fr 0;
+  }
+
+  // ⚠️ 关键: 显式给 .center 元素 grid-area, 让它占据中间列
+  // 否则没有显式 grid-area 的 .center 会被 grid-auto-flow 放到
+  // sidebar 列(0 宽), 导致 article 宽度变 0
+  body.sidebar-collapsed #quartz-body > .center {
+    grid-area: 2 / 2 / 4 / 3; // row 2-3, col 2
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  // 按钮 fixed 到左上角
+  body.sidebar-collapsed .sidebar-toggle {
+    position: fixed;
+    top: 1.2rem;
+    left: 1.2rem;
+    right: auto;
+  }
+
+  // collapsed 时去掉 body padding-left, 让内容更贴近左边
+  body.sidebar-collapsed #quartz-body {
+    padding-left: 0.5rem;
+  }
+}
+
+// === 移动端: 按钮在左下角, sidebar 默认隐藏, 点击滑出 ===
+@media all and ($mobile) {
+  // 移动端按钮: 改为左下角 fixed
+  .sidebar-toggle {
+    position: fixed;
+    top: auto;
+    bottom: 1.2rem;
+    left: 1.2rem;
+    right: auto;
+  }
+
+  // 移动端默认隐藏左侧 sidebar
   #quartz-root .left.sidebar {
     display: none;
     position: fixed;
@@ -99,6 +148,20 @@ button.toc-header {
   display: none !important;
 }
 
+// 解除 ul.toc-content.overflow 的 max-height 限制, 让 TOC 自然撑开
+// 兜底: 如果 TOC 项太多超过 sidebar 高度, ul 内部出现滚动条
+ul.toc-content.overflow {
+  max-height: none !important;
+  margin-top: 0 !important;
+  overflow-y: auto;
+}
+
+.toc {
+  overflow: visible !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+}
+
 // 标题层级粗细: H1 粗体, H2+ 细体
 ul.toc-content.overflow > li.depth-0 > a {
   font-weight: $boldWeight;
@@ -122,22 +185,24 @@ ul.toc-content.overflow > li.depth-6 > a {
   opacity: 0.7 !important;
 }
 
-// TOC 内容区调整: 去掉上边距 (因为没有 toc-header 了)
-ul.toc-content.overflow {
-  margin-top: 0 !important;
-}
-
 // === 左侧 sidebar 和主区的竖线分割 (docsify 风格) ===
-
 // 桌面端 sidebar 在左侧, 给它加右边框
 @media all and ($desktop) {
   #quartz-root .left.sidebar {
     border-right: 1px solid var(--lightgray);
-    padding-right: 1.5rem;
+    padding-right: 1rem;
   }
 }
 
 // 暗色模式下的分割线
 body.dark #quartz-root .left.sidebar {
   border-right-color: var(--gray);
+}
+
+// === sidebar 内部布局: 紧凑 ===
+#quartz-root .sidebar.left {
+  gap: 0.8rem;
+  padding-left: 1.2rem;
+  padding-right: 1rem;
+  padding-top: 5rem; // 给绝对定位的 ☰ 按钮留位置
 }

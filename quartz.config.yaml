@@ -83,10 +83,7 @@ plugins:
   - source: "@quartz-community/cname"
     enabled: false
   - source: "@quartz-community/explorer"
-    enabled: true
-    layout:
-      position: left
-      priority: 100
+    enabled: false
   - source: "@quartz-community/content-page"
     enabled: true
   - source: "@quartz-community/search"
@@ -118,12 +115,12 @@ plugins:
       priority: 50
 
   # === 关掉的"花哨"组件（保留配置方便日后开启）===
-  # === 启用 TOC: docsify 风格的文章大纲, 放右侧 ===
+  # === 启用 TOC: docsify 风格的文章大纲, 放左侧 ===
   - source: "@quartz-community/table-of-contents"
     enabled: true
     layout:
-      position: right
-      priority: 1
+      position: left
+      priority: 100
   - source: "@quartz-community/created-modified-date"
   - source: "@quartz-community/hard-line-breaks"
     enabled: false
@@ -192,20 +189,19 @@ layout:
       beforeBody: []
       left:
         - page-title
-        - explorer
+        - table-of-contents
         - search
         - darkmode
-      right:
-        - table-of-contents
+      right: []
     folder:
       positions:
         left:
-          - explorer
+          - search
           - darkmode
         right: []
     tag:
       positions:
         left:
-          - explorer
+          - search
           - darkmode
         right: []

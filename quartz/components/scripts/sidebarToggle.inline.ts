@@ -91,6 +91,33 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e)
   }
 })
 
+// 移动端: 点击文章区域自动关闭目录 (类似小程序教程的交互)
+// 只注册一次 (IIFE), 不受 SPA nav 影响
+;(function setupMobileAutoClose() {
+  document.addEventListener("click", (e) => {
+    // 目录没打开 → 无需处理
+    if (!document.body.classList.contains("sidebar-open")) return
+    // 桌面端/平板端 (>= 800px) 不处理, 只管移动端
+    if (window.matchMedia("(min-width: 800px)").matches) return
+
+    const target = e.target as HTMLElement
+    // 点击目录内部 (选章节) → 不关闭
+    if (target.closest("#quartz-root .left.sidebar")) return
+    // 点击左下角工具栏 (☰ / 主题切换) → 不关闭 (按钮自己处理)
+    if (target.closest(".toolbar-fixed")) return
+
+    // 点击文章区域 → 关闭目录
+    document.body.classList.remove("sidebar-open")
+    document.body.classList.add("sidebar-collapsed")
+
+    // 同步 ☰ 按钮的 aria-expanded 状态
+    const toggleBtn = document.querySelector(
+      ".toolbar-fixed .sidebar-toggle",
+    ) as HTMLButtonElement | null
+    if (toggleBtn) toggleBtn.setAttribute("aria-expanded", "false")
+  })
+})()
+
 // 立即执行 (afterDOMLoaded 时 DOM 已就绪)
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", setupToolbar)

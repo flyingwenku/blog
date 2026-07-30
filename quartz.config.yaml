@@ -87,7 +87,7 @@ plugins:
   - source: "@quartz-community/content-page"
     enabled: true
   - source: "@quartz-community/search"
-    enabled: true
+    enabled: false
     layout:
       position: left
       priority: 20

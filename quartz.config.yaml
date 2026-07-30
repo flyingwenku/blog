@@ -118,10 +118,13 @@ plugins:
       priority: 50
 
   # === 关掉的"花哨"组件（保留配置方便日后开启）===
-  - source: "@quartz-community/created-modified-date"
-    enabled: false
+  # === 启用 TOC: docsify 风格的文章大纲, 放右侧 ===
   - source: "@quartz-community/table-of-contents"
-    enabled: false
+    enabled: true
+    layout:
+      position: right
+      priority: 1
+  - source: "@quartz-community/created-modified-date"
   - source: "@quartz-community/hard-line-breaks"
     enabled: false
   - source: "@quartz-community/ox-hugo"
@@ -192,7 +195,8 @@ layout:
         - explorer
         - search
         - darkmode
-      right: []
+      right:
+        - table-of-contents
     folder:
       positions:
         left:

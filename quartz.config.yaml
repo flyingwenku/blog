@@ -154,7 +154,16 @@ plugins:
   - source: "@quartz-community/comments"
     enabled: false
   - source: "@quartz-community/recent-notes"
-    enabled: false
+    enabled: true
+    options:
+      limit: 50
+      hideTagPages: true
+      hideFolderPages: true
+      showTags: false
+      title: "全部文章"
+    layout:
+      position: afterBody
+      priority: 10
   - source: "@quartz-community/spacer"
     enabled: false
   - source: "@quartz-community/bases-page"

@@ -265,3 +265,49 @@ footer::after {
   opacity: 0.6;
   margin-top: 1rem;
 }
+
+// === 首页"全部文章"自动列表 (recent-notes 组件) ===
+// 只在首页显示 (body[data-slug="index"]), 文章页不显示
+body:not([data-slug="index"]) .recent-notes {
+  display: none !important;
+}
+
+.recent-notes > h3 {
+  font-size: 1.4rem;
+  margin: 2.5rem 0 1rem;
+}
+
+// 改成简单链接列表 (去掉卡片/日期样式)
+.recent-notes > ul.recent-ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.recent-notes > ul.recent-ul > li {
+  margin: 0.45rem 0;
+}
+
+// 隐藏日期 (meta)
+.recent-notes > ul.recent-ul > li .section > .meta {
+  display: none !important;
+}
+
+.recent-notes > ul.recent-ul > li .section > .desc > h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.recent-notes > ul.recent-ul > li .section > .desc > h3 > a {
+  font-weight: 500;
+  background-color: transparent;
+}
+
+// 隐藏首页自身那一条 (链接指向 ./ 或 ../) 以及 404 页面
+.recent-notes li:has(> .section > .desc > h3 > a[href="./"]),
+.recent-notes li:has(> .section > .desc > h3 > a[href="../"]),
+.recent-notes li:has(> .section > .desc > h3 > a[href="./404"]),
+.recent-notes li:has(> .section > .desc > h3 > a[href="../404"]) {
+  display: none !important;
+}
